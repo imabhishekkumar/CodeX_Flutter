@@ -1,7 +1,10 @@
 import 'package:code_x/home.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+
+void main() async {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -9,4 +12,3 @@ class MyApp extends StatelessWidget {
     return MaterialApp(title: "CodeX", home: Home());
   }
 }
-
