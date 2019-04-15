@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+var API_Key = 'Token b2361d9e-2412-47f0-aa08-cb8045063130';
+String defaultLangValue = 'c';
+String finalUrl;
+final textController = TextEditingController();
+var code;
+final String runBaseUrl = "https://run.glot.io/languages/";
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -11,69 +18,124 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      appBar: AppBar(
-        title: new Text("CodeX"),
-        actions: <Widget>[new Text("Login")],
-        backgroundColor: Colors.blueAccent,
-      ),
-      body: new Center(
-        child: new Column(
-          children: <Widget>[
-            dropdownWidget(),
-            Container(
-              margin: EdgeInsets.all(8.0),
-              // hack textfield height
-              padding: EdgeInsets.only(bottom: 40.0),
-              child: new TextField(
-                autofocus: true,
-                keyboardType: TextInputType.multiline,
-                maxLines: 20,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.all(8),
-                    hintText: "Enter your code here."),
+        resizeToAvoidBottomPadding: false,
+        appBar: AppBar(
+          title: new Text("CodeX"),
+          actions: <Widget>[
+            Ink(
+              decoration: ShapeDecoration(
+                color: Colors.blue,
+                shape: CircleBorder(),
+              ),
+              child: IconButton(
+                iconSize: 30.0,
+                icon: Icon(Icons.account_circle),
+                color: Colors.white,
+                onPressed: () {
+                  debugPrint("Icon Pressed");
+                },
               ),
             ),
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Ink(
-                  decoration: ShapeDecoration(
-                    color: Colors.red,
-                    shape: CircleBorder(),
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.delete),
-                    color: Colors.white,
-                    onPressed: () {
-                      debugPrint("Clear Pressed");
-                    },
-                  ),
-                ),
-                Ink(
-                  decoration: ShapeDecoration(
-                    color: Colors.green,
-                    shape: CircleBorder(),
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.done),
-                    color: Colors.white,
-                    onPressed: () {
-                      debugPrint("Execute Pressed");
-                    },
-                  ),
-                ),
-              ],
-            )
           ],
+          backgroundColor: Colors.blueAccent,
         ),
+        body: codeBody());
+  }
+}
+
+class codeBody extends StatefulWidget {
+  @override
+  _codeBodyState createState() => _codeBodyState();
+}
+
+class _codeBodyState extends State<codeBody> {
+  Future getResponse(selectedLang) async {
+    var data = json.encode({
+      "files": [
+        {"name": "codex." + getExtension(selectedLang), "content": code}
+      ]
+    });
+    Map<String, String> head = {
+      'Content-type': 'application/json',
+      'Authorization': API_Key,
+    };
+    final response = await http.post(
+        "https://run.glot.io/languages/" + selectedLang + "/latest",
+        body: data,
+        headers: head);
+    final responseJson = json.decode(response.body);
+    print(responseJson);
+  }
+
+  String getExtension(selectedLang) {
+    if (selectedLang == 'python') {
+      return "py";
+    } else if (selectedLang == 'kotlin') {
+      return "kt";
+    } else
+      return selectedLang;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new Center(
+      child: new Column(
+        children: <Widget>[
+          dropdownWidget(),
+          Container(
+            margin: EdgeInsets.all(8.0),
+            // hack textfield height
+            padding: EdgeInsets.only(bottom: 40.0),
+            child: new TextField(
+              autofocus: true,
+              controller: textController,
+              keyboardType: TextInputType.multiline,
+              maxLines: 20,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.all(8),
+                  hintText: "Enter your code here."),
+            ),
+          ),
+          new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Ink(
+                decoration: ShapeDecoration(
+                  color: Colors.red,
+                  shape: CircleBorder(),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.delete),
+                  color: Colors.white,
+                  onPressed: () {
+                    debugPrint("Clear Pressed");
+                    textController.clear();
+                  },
+                ),
+              ),
+              Ink(
+                decoration: ShapeDecoration(
+                  color: Colors.green,
+                  shape: CircleBorder(),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.done),
+                  color: Colors.white,
+                  onPressed: () {
+                    code = textController.text;
+                    debugPrint(code);
+                    getResponse(defaultLangValue);
+                  },
+                ),
+              ),
+            ],
+          )
+        ],
       ),
     );
   }
 }
-
-String defaultLangValue = ''; //languages[2];
 
 class dropdownWidget extends StatefulWidget {
   @override
@@ -81,28 +143,44 @@ class dropdownWidget extends StatefulWidget {
 }
 
 class _dropdownWidgetState extends State<dropdownWidget> {
-  final String langUrl = "https://run.glot.io/languages";
-  List<String> languages = [];
-  @override
-  void initState() {
-    super.initState();
-    this.apiCall();
-  }
-
-  List _data;
-
-  void apiCall() async {
-    _data = await getLanguages();
-    for (var i = 0; i <= _data.length - 1; i++) {
-      this.languages.add(_data[i]["name"]);
-    }
-    print(languages);
-  }
-
-  Future<List> getLanguages() async {
-    http.Response langResponse = await http.get(langUrl);
-    return json.decode(langResponse.body);
-  }
+  final List<String> languages = [
+    'assembly',
+    'ats',
+    'bash',
+    'c',
+    'clojure',
+    'cobol',
+    'coffeescript',
+    'cpp',
+    'crystal',
+    'csharp',
+    'd',
+    'elixir',
+    'elm',
+    'erlang',
+    'fsharp',
+    'go',
+    'groovy',
+    'haskell',
+    'idris',
+    'java',
+    'javascript',
+    'julia',
+    'kotlin',
+    'lua',
+    'mercury',
+    'nim',
+    'ocaml',
+    'perl',
+    'perl6',
+    'php',
+    'python',
+    'ruby',
+    'rust',
+    'scala',
+    'swift',
+    'typescript'
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -117,14 +195,13 @@ class _dropdownWidgetState extends State<dropdownWidget> {
             ),
           ),
           DropdownButton<String>(
-            value: defaultLangValue == "" ? 'c' : defaultLangValue,
+            value: defaultLangValue == "c" ? 'c' : defaultLangValue,
             onChanged: (String newValue) {
               setState(() {
                 defaultLangValue = newValue;
               });
             },
-            items: languages // <String>['C', 'C++', 'Python', 'Java']
-                .map<DropdownMenuItem<String>>((String value) {
+            items: languages.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(
