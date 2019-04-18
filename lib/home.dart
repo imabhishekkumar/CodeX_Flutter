@@ -1,3 +1,4 @@
+import 'package:code_x/input.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,6 +9,7 @@ String finalUrl;
 final textController = TextEditingController();
 var code;
 final String runBaseUrl = "https://run.glot.io/languages/";
+int pos = 0;
 
 class Home extends StatefulWidget {
   @override
@@ -15,40 +17,15 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          title: new Text("CodeX"),
-          actions: <Widget>[
-            Ink(
-              decoration: ShapeDecoration(
-                color: Colors.blue,
-                shape: CircleBorder(),
-              ),
-              child: IconButton(
-                iconSize: 30.0,
-                icon: Icon(Icons.account_circle),
-                color: Colors.white,
-                onPressed: () {
-                  debugPrint("Icon Pressed");
-                },
-              ),
-            ),
-          ],
-          backgroundColor: Colors.blueAccent,
-        ),
-        body: codeBody());
+  String getExtension(selectedLang) {
+    if (selectedLang == 'python') {
+      return "py";
+    } else if (selectedLang == 'kotlin') {
+      return "kt";
+    } else
+      return selectedLang;
   }
-}
 
-class codeBody extends StatefulWidget {
-  @override
-  _codeBodyState createState() => _codeBodyState();
-}
-
-class _codeBodyState extends State<codeBody> {
   Future getResponse(selectedLang) async {
     var data = json.encode({
       "files": [
@@ -65,84 +42,9 @@ class _codeBodyState extends State<codeBody> {
         headers: head);
     final responseJson = json.decode(response.body);
     print(responseJson);
+    return responseJson;
   }
 
-  String getExtension(selectedLang) {
-    if (selectedLang == 'python') {
-      return "py";
-    } else if (selectedLang == 'kotlin') {
-      return "kt";
-    } else
-      return selectedLang;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Center(
-      child: new Column(
-        children: <Widget>[
-          dropdownWidget(),
-          Container(
-            margin: EdgeInsets.all(8.0),
-            // hack textfield height
-            padding: EdgeInsets.only(bottom: 40.0),
-            child: new TextField(
-              autofocus: true,
-              controller: textController,
-              keyboardType: TextInputType.multiline,
-              maxLines: 20,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.all(8),
-                  hintText: "Enter your code here."),
-            ),
-          ),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Ink(
-                decoration: ShapeDecoration(
-                  color: Colors.red,
-                  shape: CircleBorder(),
-                ),
-                child: IconButton(
-                  icon: Icon(Icons.delete),
-                  color: Colors.white,
-                  onPressed: () {
-                    debugPrint("Clear Pressed");
-                    textController.clear();
-                  },
-                ),
-              ),
-              Ink(
-                decoration: ShapeDecoration(
-                  color: Colors.green,
-                  shape: CircleBorder(),
-                ),
-                child: IconButton(
-                  icon: Icon(Icons.done),
-                  color: Colors.white,
-                  onPressed: () {
-                    code = textController.text;
-                    debugPrint(code);
-                    getResponse(defaultLangValue);
-                  },
-                ),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class dropdownWidget extends StatefulWidget {
-  @override
-  _dropdownWidgetState createState() => _dropdownWidgetState();
-}
-
-class _dropdownWidgetState extends State<dropdownWidget> {
   final List<String> languages = [
     'assembly',
     'ats',
@@ -181,20 +83,19 @@ class _dropdownWidgetState extends State<dropdownWidget> {
     'swift',
     'typescript'
   ];
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Row(
-        children: <Widget>[
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(
+        title: new Text(
+          "CodeX",
+          style: TextStyle(color: Colors.black),
+        ),
+        actions: <Widget>[
           Container(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              "Choose target language: ",
-              style: TextStyle(),
-            ),
-          ),
-          DropdownButton<String>(
+            padding: EdgeInsets.all(16),
+          child: DropdownButton<String>(
             value: defaultLangValue == "c" ? 'c' : defaultLangValue,
             onChanged: (String newValue) {
               setState(() {
@@ -205,13 +106,63 @@ class _dropdownWidgetState extends State<dropdownWidget> {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(
-                  value,
-                  style: TextStyle(color: Colors.black),
+                  value.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.black 
+                  ),
                 ),
               );
             }).toList(),
+          )
+          ),
+          Ink(
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: CircleBorder(),
+            ),
+            child: IconButton(
+              iconSize: 30.0,
+              icon: Icon(Icons.account_circle),
+              color: Colors.black26,
+              onPressed: () {
+                debugPrint("Icon Pressed");
+              },
+            ),
           ),
         ],
+        backgroundColor: Colors.white,
+      ),
+      body: TextField(
+        autofocus: true,
+        controller: textController,
+        keyboardType: TextInputType.multiline,
+        maxLines: 99,
+        style: TextStyle(color: Colors.greenAccent),
+        decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: EdgeInsets.all(8.0),
+            hintText: "Enter your code here."),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(
+          Icons.done,
+          color: Colors.black,
+        ),
+        backgroundColor: Colors.white,
+        onPressed: () {
+          code = textController.text;
+          debugPrint(code);
+          getResponse(defaultLangValue);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => inputBody()),
+          );
+        },
+        label: Text(
+          "Execute",
+          style: TextStyle(color: Colors.black),
+        ),
       ),
     );
   }

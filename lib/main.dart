@@ -9,6 +9,11 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: "CodeX", home: Home());
+    return MaterialApp(title: "CodeX",
+    theme: ThemeData(
+        primarySwatch: Colors.blueGrey,
+      ),
+    home: Home());
   }
 }
+
