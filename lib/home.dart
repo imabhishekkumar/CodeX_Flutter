@@ -67,7 +67,6 @@ class _HomeState extends State<Home> {
         body: data,
         headers: head);
     final responseJson = json.decode(response.body);
-    //print(responseJson);
     getOutput(responseJson);
   }
 
@@ -94,8 +93,6 @@ class _HomeState extends State<Home> {
     output = responseJson['stdout'];
     stderr = responseJson['stderr'];
     error = responseJson['error'];
-
-    //print(responseJson);
     if (output != '') {
       print(output);
       toShow = output;

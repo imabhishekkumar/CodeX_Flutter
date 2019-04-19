@@ -11,9 +11,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: "CodeX",
         debugShowCheckedModeBanner: false,
-        /*theme: ThemeData(
-          primarySwatch: Colors.grey,
-        ),*/
         home: Home());
   }
 }
