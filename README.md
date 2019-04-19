@@ -6,12 +6,12 @@ The application focuses on material design with clean and minimal UI.
 
 # Screenshots
 <img src="https://github.com/imabhishekkumar/CodeX_Flutter/blob/master/screenshots/home.png?raw=true" height="500"
-width="270">
+width="350">
 <img src="https://github.com/imabhishekkumar/CodeX_Flutter/blob/master/screenshots/code.png?raw=true" height="500"
-width="270">
+width="350">
 <img src="https://github.com/imabhishekkumar/CodeX_Flutter/blob/master/screenshots/input.png?raw=true" height="500"
-width="270">
+width="350">
 <img src="https://github.com/imabhishekkumar/CodeX_Flutter/blob/master/screenshots/output.png?raw=true" height="500"
-width="270">
+width="350">
 <img src="https://github.com/imabhishekkumar/CodeX_Flutter/blob/master/screenshots/languages.png?raw=true" height="500"
-width="270">
+width="350">
