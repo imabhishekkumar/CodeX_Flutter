@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 
-var API_Key = 'Token b2361d9e-2412-47f0-aa08-cb8045063130';
+var API_Key = '';
 String defaultLangValue = 'c';
 String finalUrl;
 String filePath;
