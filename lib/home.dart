@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 
-var API_Key = '';
+var apikey = '';
 String defaultLangValue = 'c';
 String finalUrl;
 String filePath;
@@ -60,7 +61,7 @@ class _HomeState extends State<Home> {
     });
     Map<String, String> head = {
       'Content-type': 'application/json',
-      'Authorization': API_Key,
+      'Authorization': apikey,
     };
     final response = await http.post(
         "https://run.glot.io/languages/" + selectedLang + "/latest",
@@ -79,7 +80,7 @@ class _HomeState extends State<Home> {
     });
     Map<String, String> head = {
       'Content-type': 'application/json',
-      'Authorization': API_Key,
+      'Authorization': apikey,
     };
     final response = await http.post(
         "https://run.glot.io/languages/" + selectedLang + "/latest",
@@ -120,12 +121,14 @@ class _HomeState extends State<Home> {
                   controller: inputtextController,
                   keyboardType: TextInputType.multiline,
                   maxLines: 10,
-                  style: TextStyle(color: Colors.black),
+                  style: TextStyle(color: Colors.white),
                   decoration: InputDecoration(
+                      border: InputBorder.none,
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Colors.blueGrey[900],
                       contentPadding: EdgeInsets.all(8.0),
-                      hintText: "Enter your input here (if any)."),
+                      hintStyle: TextStyle(color: Colors.grey),
+                      hintText: "Enter your input here (if any)"),
                 ),
               ),
               new RaisedButton(
@@ -199,10 +202,11 @@ class _HomeState extends State<Home> {
     'typescript'
   ];
   void getFile() async {
-    filePath = await FilePicker.getFilePath(type: FileType.ANY);
+    filePath = await FilePicker.getFilePath(type: FileType.any);
     Future<String> getFileData(String path) async {
       return await rootBundle.loadString(path);
     }
+
     String data = await getFileData(filePath);
     setState(() {
       textController.text = data;
@@ -213,75 +217,101 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Colors.blueGrey[800],
       appBar: AppBar(
+        backgroundColor: Colors.blueGrey[900],
         title: new Text(
           "CodeX",
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.grey),
         ),
         actions: <Widget>[
           Container(
-              padding: EdgeInsets.all(8),
-              child: DropdownButton<String>(
-                value: defaultLangValue == "c" ? 'c' : defaultLangValue,
-                style: TextStyle(),
-                onChanged: (String newValue) {
-                  setState(() {
-                    defaultLangValue = newValue;
-                  });
-                },
-                items: languages.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value.toUpperCase(),
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  );
-                }).toList(),
-              )),
+            padding: EdgeInsets.all(8),
+            child: DropdownButton<String>(
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Colors.grey,
+              ),
+              dropdownColor: Colors.blueGrey[900],
+              value: defaultLangValue == "c" ? 'c' : defaultLangValue,
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              onChanged: (String newValue) {
+                setState(() {
+                  defaultLangValue = newValue;
+                });
+              },
+              items: languages.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value.toUpperCase(),
+                    style: TextStyle(color: Colors.blue[200]),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
           Ink(
             decoration: ShapeDecoration(
-              color: Colors.white,
+              color: Colors.blueGrey[900],
               shape: CircleBorder(),
             ),
             child: IconButton(
               iconSize: 30.0,
-              icon: Icon(Icons.add),
-              color: Colors.black54,
+              icon: Icon(
+                Icons.add,
+                color: Colors.grey,
+                size: 23,
+              ),
               onPressed: () {
                 getFile();
               },
             ),
           ),
         ],
-        backgroundColor: Colors.white,
       ),
-      body: TextField(
-        controller: textController,
-        keyboardType: TextInputType.multiline,
-        maxLines: 99,
-        style: TextStyle(color: Colors.black),
-        decoration: InputDecoration(
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.all(8.0),
-            hintText: "Enter your code here."),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        icon: Icon(
-          Icons.done,
-          color: Colors.black,
-        ),
-        backgroundColor: Colors.white,
-        onPressed: () {
-          code = textController.text;
-          debugPrint(code);
-          openInputSheet(context);
-        },
-        label: Text(
-          "Next",
-          style: TextStyle(color: Colors.black),
-        ),
+      body: Column(
+        children: [
+          SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height - 150,
+              child: TextField(
+                cursorColor: Colors.greenAccent[400],
+                cursorRadius: Radius.circular(10.0),
+                cursorWidth: 5.0,
+                controller: textController,
+                keyboardAppearance: Brightness.dark,
+                keyboardType: TextInputType.multiline,
+                maxLines: 99,
+                style: TextStyle(color: Colors.blue[50]),
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    filled: true,
+                    fillColor: Colors.blueGrey[800],
+                    contentPadding: EdgeInsets.all(8.0),
+                    hintText: "Enter your code here."),
+              ),
+            ),
+          ),
+          RaisedButton(
+            shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(10.0)),
+            color: Colors.blue,
+            onPressed: () {
+              code = textController.text;
+              debugPrint(code);
+              openInputSheet(context);
+            },
+            child: Text(
+              "RUN",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 3.0),
+            ),
+          ),
+        ],
       ),
     );
   }
